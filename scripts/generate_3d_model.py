@@ -52,16 +52,41 @@ def generate_3d_model_from_image(image_path, output_path):
     }
 
     # Prompting GPT-4o to generate a simplified OBJ file based on the image description.
-    # In a real-world scenario, you'd send the image itself if the API supports it.
-    # Here we describe the mannequin from the image provided by the user.
-    prompt = "Generate a simple 3D OBJ file for a low-poly human mannequin standing in a neutral pose. Output ONLY the OBJ file content starting with 'v ' and ending with 'f '."
+    # We use a base-64 encoded image to allow GPT-4o to "see" the mannequin.
+    import base64
+    
+    def encode_image(image_path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
+
+    base64_image = encode_image(image_path)
+
+    prompt = """
+    You are a 3D modeling expert. Analyze the attached image of a human mannequin and generate a 3D OBJ file representing its geometry.
+    - Create a low-poly human-shaped mesh (head, torso, arms, legs).
+    - Ensure the vertices (v) and faces (f) form a valid manifold 3D object.
+    - The output MUST be ONLY the raw OBJ file content.
+    - Do not include any text, markdown formatting, or explanation.
+    - Start with 'v ' and end with the last 'f ' line.
+    """
 
     payload = {
         "model": "gpt-4o",
         "messages": [
-            {"role": "user", "content": prompt}
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{base64_image}"
+                        }
+                    }
+                ]
+            }
         ],
-        "temperature": 0.2
+        "temperature": 0.1
     }
 
     print("Requesting 3D mesh from GitHub Models...")
