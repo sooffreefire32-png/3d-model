@@ -12,6 +12,8 @@ on:
 jobs:
   generate-3d-model:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,6 +51,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add output/final_model.glb
           git commit -m "Add generated 3D model from ${{ github.event.inputs.image_path }}"
-          git push
+          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
