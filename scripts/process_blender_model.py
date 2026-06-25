@@ -11,10 +11,20 @@ def process_blender_model(input_obj_path, output_glb_path):
 
     # Import the OBJ file
     try:
-        bpy.ops.import_scene.obj(filepath=input_obj_path)
+        # Check Blender version to use the correct operator
+        if bpy.app.version >= (4, 0, 0):
+            # Blender 4.0+ uses a new operator for OBJ import
+            bpy.ops.wm.obj_import(filepath=input_obj_path)
+        else:
+            # Older versions
+            bpy.ops.import_scene.obj(filepath=input_obj_path)
     except Exception as e:
         print(f"Error importing OBJ: {e}")
-        sys.exit(1)
+        # Fallback: Try the other one just in case
+        try:
+            bpy.ops.wm.obj_import(filepath=input_obj_path)
+        except:
+            sys.exit(1)
 
     # Here you can add Blender processing steps:
     # - Scaling
