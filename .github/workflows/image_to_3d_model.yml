@@ -31,7 +31,7 @@ jobs:
         run: |
           python /home/ubuntu/3d-model/scripts/generate_3d_model.py ${{ github.event.inputs.image_path }} /home/ubuntu/3d-model/output/generated_model.obj
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           # Add any other AI service API keys as secrets
 
       - name: Set up Blender
@@ -54,4 +54,4 @@ jobs:
           git commit -m "Add generated 3D model from ${{ github.event.inputs.image_path }}"
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
